@@ -20,6 +20,7 @@
 
         internal const string PollyMethodName = "PollyExecute";
         internal const string PollyMethodNameVoid = "PollyExecuteVoid";
+        //internal const string PollyMethodNameVoidAsync = "PollyExecuteVoidAsync"; // Currently unable to detect void methods that implement GetAwaiter()
 
         internal const string PollyFieldName = "_polly";
         internal const string PollyFieldType = "PolicyWrap";

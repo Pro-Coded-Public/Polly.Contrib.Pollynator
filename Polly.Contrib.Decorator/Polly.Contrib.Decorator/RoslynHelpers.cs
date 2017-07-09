@@ -94,22 +94,16 @@
             var typeArguments = methodSymbol.TypeArguments.Select(symbol => gen.IdentifierName(symbol.Name)).
                 ToList();
 
-            // TODO: Verify correct behaviour - should async methods be marked as such....? It would appear so.
-            // TODO: Why is detection not working
-            var declarationModifier = methodSymbol.IsAsync ? DeclarationModifiers.Async : DeclarationModifiers.None;
+            // TODO: Improve detection of potentially asynchronous methods
+            var isAsync = false;
 
-            var lambda = gen.InvocationExpression(gen.IdentifierName(Constants.PollyMethodNameVoid),
-                gen.VoidReturningLambdaExpression(
-                    gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(fieldName),
-                            gen.GenericName(methodSymbol.Name, typeArguments)),
-                        arguments)));
-
-            var lambdaReturn = gen.ReturnStatement(
-                gen.InvocationExpression(gen.IdentifierName(Constants.PollyMethodName),
-                    gen.ValueReturningLambdaExpression(
-                        gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(fieldName),
-                                gen.GenericName(methodSymbol.Name, typeArguments)),
-                            arguments))));
+            var declarationModifier = DeclarationModifiers.None;
+     
+            if (methodSymbol.ReturnType.ToString().Contains("System.Threading.Tasks.Task"))
+            {
+                //declarationModifier = DeclarationModifiers.Async;
+                isAsync = true;
+            }
 
             var returnType = methodSymbol.ReturnsVoid
                                  ? null
@@ -119,7 +113,8 @@
                                          SymbolDisplayFormat.MinimallyQualifiedFormat))
                                      : gen.TypeExpression(methodSymbol.ReturnType.SpecialType);
 
-            var executionStatement = methodSymbol.ReturnsVoid ? lambda : lambdaReturn;
+            var executionStatement = methodSymbol.ReturnsVoid ? GenerateLambdaInvocation(gen, methodSymbol, fieldName, typeArguments, arguments, isAsync)
+                : GenerateLambdaReturn(gen, methodSymbol, fieldName, typeArguments, arguments, isAsync);
 
             var method = gen.MethodDeclaration(methodSymbol.Name,
                 parameters,
@@ -169,6 +164,39 @@
             }
 
             return method;
+        }
+
+        private static SyntaxNode GenerateLambdaReturn(SyntaxGenerator gen, IMethodSymbol methodSymbol, string fieldName,
+                                                       List<SyntaxNode> typeArguments, List<SyntaxNode> arguments, bool isAsync)
+        {
+            var pollyMethodName = isAsync? Constants.PollyMethodNameAsync : Constants.PollyMethodName;
+
+            var lambdaReturn = gen.ReturnStatement(gen.InvocationExpression(gen.IdentifierName(pollyMethodName),
+                gen.ValueReturningLambdaExpression(
+                    gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(fieldName),
+                            gen.GenericName(methodSymbol.Name, typeArguments)),
+                        arguments))));
+
+            //if (isAsync) { lambdaReturn = gen.AwaitExpression(lambdaReturn); }
+            return lambdaReturn;
+        }
+
+        private static SyntaxNode GenerateLambdaInvocation(SyntaxGenerator gen, IMethodSymbol methodSymbol, string fieldName,
+                                                           List<SyntaxNode> typeArguments, List<SyntaxNode> arguments, bool isAsync)
+        {
+            // Currently unable to detect void methods that implement GetAwaiter()
+            //var pollyMethodName = isAsync ? Constants.PollyMethodNameVoidAsync : Constants.PollyMethodNameVoid;
+            var pollyMethodName = Constants.PollyMethodNameVoid;
+
+            var lambda = gen.InvocationExpression(gen.IdentifierName(pollyMethodName),
+                gen.VoidReturningLambdaExpression(
+                    gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(fieldName),
+                            gen.GenericName(methodSymbol.Name, typeArguments)),
+                        arguments)));
+
+            //if (isAsync) { lambda = gen.AwaitExpression(lambda); }
+
+            return lambda;
         }
 
         internal static void GenerateMissingEvents(ClassDeclarationSyntax classDeclaration, ITypeSymbol interfaceType,
@@ -248,18 +276,25 @@
 
             var returnType = gen.GenericName("Task", gen.IdentifierName(Constants.PollyGenericTypeParameter));
 
+            //var statement =
+            //    gen.ReturnStatement(gen.AwaitExpression(
+            //        gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(Constants.PollyFieldName),
+            //                gen.IdentifierName("ExecuteAsync")),
+            //            polyFunc)));
+
             var statement =
-                gen.ReturnStatement(gen.AwaitExpression(
+                gen.ReturnStatement(
                     gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(Constants.PollyFieldName),
                             gen.IdentifierName("ExecuteAsync")),
-                        polyFunc)));
+                        polyFunc));
 
             return gen.MethodDeclaration(Constants.PollyMethodNameAsync,
                 parameters,
                 PollyGenericTypeParameters,
                 returnType,
                 Accessibility.Private,
-                DeclarationModifiers.Async,
+                //DeclarationModifiers.Async,
+                DeclarationModifiers.None,
                 new[] { statement });
         }
 

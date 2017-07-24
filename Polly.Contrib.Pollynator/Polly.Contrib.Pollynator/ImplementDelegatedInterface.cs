@@ -1,4 +1,4 @@
-﻿namespace Polly.Contrib.Decorator
+﻿namespace Polly.Contrib.Pollynator
 {
     #region Using Directives
 
@@ -17,7 +17,7 @@
 
     #endregion
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = Constants.Title)]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = Constants.ProjectTitle)]
     [Shared]
     public class ImplementDelegatedInterface : CodeFixProvider
     {
@@ -71,6 +71,15 @@
                         minificationLocation),
                     equivalenceKey: Constants.Title),
                 diagnostic);
+
+            context.RegisterCodeFix(CodeAction.Create(Constants.TitleWithAsync,
+                    c => FixImplementDelegatedInterfaceAsync(context.Document,
+                        interfaceIdentifier,
+                        c,
+                        classDeclaration,
+                        minificationLocation, true),
+                    equivalenceKey: Constants.TitleWithAsync),
+                diagnostic);
         }
 
         #endregion
@@ -79,7 +88,7 @@
 
         private static async Task<Document> FixImplementDelegatedInterfaceAsync(
             Document document, SyntaxNode interfaceIdentifier, CancellationToken cancellationToken,
-            ClassDeclarationSyntax classDeclaration, int minificationLocation)
+            ClassDeclarationSyntax classDeclaration, int minificationLocation, bool includeAsyncAwait = false)
         {
             // Create a DocumentEditor instance
             var editor = await DocumentEditor.CreateAsync(document, cancellationToken).
@@ -91,7 +100,7 @@
             var classType = model.GetDeclaredSymbol(classDeclaration) as ITypeSymbol;
             var interfaceTypeInfo = model.GetTypeInfo(interfaceIdentifier.FirstAncestorOrSelf<IdentifierNameSyntax>());
             var interfaceType = interfaceTypeInfo.Type;
-           
+
             if (!RoslynHelpers.NamedItemExists(classDeclaration, Constants.ImplementationFieldName))
             {
                 editor.AddMember(classDeclaration,
@@ -135,7 +144,7 @@
             if (!RoslynHelpers.NamedItemExists(classDeclaration, Constants.PollyMethodNameAsync))
             {
                 editor.AddMember(classDeclaration,
-                    RoslynHelpers.GeneratePollyExecuteAsync(generator, pollyParameterName));
+                    RoslynHelpers.GeneratePollyExecuteAsync(generator, pollyParameterName, includeAsyncAwait));
             }
 
             RoslynHelpers.GenerateMissingEvents(classDeclaration, interfaceType, classType, editor, generator);
@@ -148,7 +157,8 @@
                 editor,
                 generator,
                 model,
-                minificationLocation);
+                minificationLocation,
+                includeAsyncAwait);
 
             return editor.GetChangedDocument();
         }

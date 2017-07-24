@@ -1,4 +1,4 @@
-﻿namespace Polly.Contrib.Decorator
+﻿namespace Polly.Contrib.Pollynator
 {
     internal static class Constants
     {
@@ -26,8 +26,9 @@
         internal const string PollyFieldType = "PolicyWrap";
         internal const string PollyConstructorParameterName = "polly";
 
-        internal const string Title = "Implement Interface Decorated with Polly";
-
+        internal const string ProjectTitle = "Pollynator";
+        internal const string Title = "Implement Interface with Polly";
+        internal const string TitleWithAsync = "Implement Interface with Polly, including async await";
         #endregion
     }
 }

@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Polly.Contrib.Decorator")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Pollynator")]
+[assembly: AssemblyDescription("A Code Fix for creating implementations of interfaces, using the Polly for reslience (e.g. handling timeouts, retry logic, etc).")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Polly.Contrib.Decorator.Vsix.Properties")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
+[assembly: AssemblyCompany("Pro-Coded")]
+[assembly: AssemblyProduct("Pollynator")]
+[assembly: AssemblyCopyright("Copyright ©  2017 Pro-Coded")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.1.0.0")]
+[assembly: AssemblyFileVersion("0.1.0.0")]

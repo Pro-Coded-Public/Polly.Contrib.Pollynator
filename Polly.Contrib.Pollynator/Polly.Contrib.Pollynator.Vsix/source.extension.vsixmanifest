@@ -1,9 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="Polly.Contrib.Decorator..a4145ce4-df4f-46dc-a66c-4b98df4bb264" Version="1.0" Language="en-US" Publisher="David Paul McQuiggin"/>
-    <DisplayName>Polly.Contrib.Decorator</DisplayName>
-    <Description xml:space="preserve">This is a sample code extension for creating decorators of interfaces, implementing Polly.</Description>
+    <Identity Id="Polly.Contrib.Pollynator..a4145ce4-df4f-46dc-a66c-4b98df4bb264" Version="0.1" Language="en-US" Publisher="David Paul McQuiggin"/>
+    <DisplayName>Pollynator</DisplayName>
+    <Description xml:space="preserve">A Code Fix for creating implementations of interfaces, using the Polly library for reslience (e.g. handling timeouts, retry logic, etc).</Description>
+    <MoreInfo>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</MoreInfo>
+    <GettingStartedGuide>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</GettingStartedGuide>
+    <Tags>Pollynator,. Polly, Pro-Coded</Tags>
   </Metadata>
   <Installation>
     <InstallationTarget Version="[14.0,]" Id="Microsoft.VisualStudio.Pro" />
@@ -12,7 +15,7 @@
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.5,)" />
   </Dependencies>
   <Assets>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Polly.Contrib.Decorator" Path="|Polly.Contrib.Decorator|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Polly.Contrib.Pollynator" Path="|Polly.Contrib.Pollynator|" />
   </Assets>
   <Prerequisites>
     <Prerequisite Id="Microsoft.VisualStudio.Component.CoreEditor" Version="[15.0,16.0)" DisplayName="Visual Studio core editor" />

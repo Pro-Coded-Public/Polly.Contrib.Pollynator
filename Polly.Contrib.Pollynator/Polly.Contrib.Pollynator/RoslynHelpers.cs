@@ -1,4 +1,4 @@
-﻿namespace Polly.Contrib.Decorator
+﻿namespace Polly.Contrib.Pollynator
 {
     #region Using Directives
 
@@ -79,8 +79,9 @@
                 DeclarationModifiers.ReadOnly);
         }
 
-        internal static SyntaxNode GenerateMethodImplementation(SyntaxGenerator gen, SemanticModel model, int minificationLocation,
-                                                                IMethodSymbol methodSymbol, string fieldName)
+        internal static SyntaxNode GenerateMethodImplementation(SyntaxGenerator gen, SemanticModel model,
+                                                                int minificationLocation, IMethodSymbol methodSymbol,
+                                                                string fieldName, bool includeAsyncAwait)
         {
             var parameters = methodSymbol.Parameters.Select(symbol => gen.ParameterDeclaration(symbol)).
                 ToList();
@@ -98,10 +99,11 @@
             var isAsync = false;
 
             var declarationModifier = DeclarationModifiers.None;
-     
-            if (methodSymbol.ReturnType.ToString().Contains("System.Threading.Tasks.Task"))
+
+            if (methodSymbol.ReturnType.ToString().
+                Contains("System.Threading.Tasks.Task"))
             {
-                //declarationModifier = DeclarationModifiers.Async;
+                if (includeAsyncAwait) declarationModifier = DeclarationModifiers.Async;
                 isAsync = true;
             }
 
@@ -113,8 +115,21 @@
                                          SymbolDisplayFormat.MinimallyQualifiedFormat))
                                      : gen.TypeExpression(methodSymbol.ReturnType.SpecialType);
 
-            var executionStatement = methodSymbol.ReturnsVoid ? GenerateLambdaInvocation(gen, methodSymbol, fieldName, typeArguments, arguments, isAsync)
-                : GenerateLambdaReturn(gen, methodSymbol, fieldName, typeArguments, arguments, isAsync);
+            var executionStatement = methodSymbol.ReturnsVoid
+                                         ? GenerateLambdaInvocation(gen,
+                                             methodSymbol,
+                                             fieldName,
+                                             typeArguments,
+                                             arguments,
+                                             isAsync,
+                                             includeAsyncAwait)
+                                         : GenerateLambdaReturn(gen,
+                                             methodSymbol,
+                                             fieldName,
+                                             typeArguments,
+                                             arguments,
+                                             isAsync,
+                                             includeAsyncAwait);
 
             var method = gen.MethodDeclaration(methodSymbol.Name,
                 parameters,
@@ -156,36 +171,41 @@
                     method = gen.WithTypeConstraint(method,
                         constraint.Name,
                         SpecialTypeConstraintKind.None,
-                        constraint.ConstraintTypes.Select(
-                            symbol => gen.IdentifierName(symbol.ToMinimalDisplayString(model,
-                                minificationLocation,
-                                SymbolDisplayFormat.MinimallyQualifiedFormat))));
+                        constraint.ConstraintTypes.Select(symbol => gen.IdentifierName(symbol.ToMinimalDisplayString(
+                            model,
+                            minificationLocation,
+                            SymbolDisplayFormat.MinimallyQualifiedFormat))));
                 }
             }
 
             return method;
         }
 
-        private static SyntaxNode GenerateLambdaReturn(SyntaxGenerator gen, IMethodSymbol methodSymbol, string fieldName,
-                                                       List<SyntaxNode> typeArguments, List<SyntaxNode> arguments, bool isAsync)
+        private static SyntaxNode GenerateLambdaReturn(SyntaxGenerator gen, IMethodSymbol methodSymbol,
+                                                       string fieldName, List<SyntaxNode> typeArguments,
+                                                       List<SyntaxNode> arguments, bool isAsync, bool includeAsyncAwait)
         {
-            var pollyMethodName = isAsync? Constants.PollyMethodNameAsync : Constants.PollyMethodName;
+            var pollyMethodName = isAsync && includeAsyncAwait ? Constants.PollyMethodNameAsync : Constants.PollyMethodName;
 
-            var lambdaReturn = gen.ReturnStatement(gen.InvocationExpression(gen.IdentifierName(pollyMethodName),
+            var invocation = gen.InvocationExpression(gen.IdentifierName(pollyMethodName),
                 gen.ValueReturningLambdaExpression(
                     gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(fieldName),
                             gen.GenericName(methodSymbol.Name, typeArguments)),
-                        arguments))));
+                        arguments)));
+            if (isAsync && includeAsyncAwait) { invocation = gen.AwaitExpression(invocation); }
 
-            //if (isAsync) { lambdaReturn = gen.AwaitExpression(lambdaReturn); }
+            var lambdaReturn = gen.ReturnStatement(invocation);
+
+
             return lambdaReturn;
         }
 
-        private static SyntaxNode GenerateLambdaInvocation(SyntaxGenerator gen, IMethodSymbol methodSymbol, string fieldName,
-                                                           List<SyntaxNode> typeArguments, List<SyntaxNode> arguments, bool isAsync)
+        private static SyntaxNode GenerateLambdaInvocation(SyntaxGenerator gen, IMethodSymbol methodSymbol,
+                                                           string fieldName, List<SyntaxNode> typeArguments,
+                                                           List<SyntaxNode> arguments, bool isAsync, bool includeAsyncAwait)
         {
             // Currently unable to detect void methods that implement GetAwaiter()
-            //var pollyMethodName = isAsync ? Constants.PollyMethodNameVoidAsync : Constants.PollyMethodNameVoid;
+            //var pollyMethodName = isAsync && includeAsyncAwait ? Constants.PollyMethodNameVoidAsync : Constants.PollyMethodNameVoid;
             var pollyMethodName = Constants.PollyMethodNameVoid;
 
             var lambda = gen.InvocationExpression(gen.IdentifierName(pollyMethodName),
@@ -194,7 +214,7 @@
                             gen.GenericName(methodSymbol.Name, typeArguments)),
                         arguments)));
 
-            //if (isAsync) { lambda = gen.AwaitExpression(lambda); }
+            //if (isAsync && includeAsyncAwait) { lambda = gen.AwaitExpression(lambda); }
 
             return lambda;
         }
@@ -212,7 +232,7 @@
 
         internal static void GenerateMissingMethods(ClassDeclarationSyntax classDeclaration, ITypeSymbol interfaceType,
                                                     ITypeSymbol classType, DocumentEditor editor, SyntaxGenerator gen,
-                                                    SemanticModel model, int minificationLocation)
+                                                    SemanticModel model, int minificationLocation, bool includeAsyncAwait)
         {
             foreach (var member in interfaceType.GetMembers().
                 OfType<IMethodSymbol>().
@@ -221,7 +241,11 @@
                 if (classType.FindImplementationForInterfaceMember(member) != null) continue;
 
                 editor.AddMember(classDeclaration,
-                    GenerateMethodImplementation(gen, model, minificationLocation, member, Constants.ImplementationFieldName));
+                    GenerateMethodImplementation(gen,
+                        model,
+                        minificationLocation,
+                        member,
+                        Constants.ImplementationFieldName, includeAsyncAwait));
             }
         }
 
@@ -264,7 +288,8 @@
                 new[] { statement });
         }
 
-        internal static SyntaxNode GeneratePollyExecuteAsync(SyntaxGenerator gen, SyntaxNode[] polyFunc)
+        internal static SyntaxNode GeneratePollyExecuteAsync(SyntaxGenerator gen, SyntaxNode[] polyFunc,
+                                                             bool includeAsyncAwait)
         {
             var parameters = new[]
                                  {
@@ -276,25 +301,25 @@
 
             var returnType = gen.GenericName("Task", gen.IdentifierName(Constants.PollyGenericTypeParameter));
 
-            //var statement =
-            //    gen.ReturnStatement(gen.AwaitExpression(
-            //        gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(Constants.PollyFieldName),
-            //                gen.IdentifierName("ExecuteAsync")),
-            //            polyFunc)));
-
-            var statement =
-                gen.ReturnStatement(
-                    gen.InvocationExpression(gen.MemberAccessExpression(gen.IdentifierName(Constants.PollyFieldName),
-                            gen.IdentifierName("ExecuteAsync")),
-                        polyFunc));
+            var statement = includeAsyncAwait
+                                ? gen.ReturnStatement(
+                                    gen.AwaitExpression(
+                                        gen.InvocationExpression(gen.MemberAccessExpression(
+                                                gen.IdentifierName(Constants.PollyFieldName),
+                                                gen.IdentifierName("ExecuteAsync")),
+                                            polyFunc)))
+                                : gen.ReturnStatement(
+                                    gen.InvocationExpression(
+                                        gen.MemberAccessExpression(gen.IdentifierName(Constants.PollyFieldName),
+                                            gen.IdentifierName("ExecuteAsync")),
+                                        polyFunc));
 
             return gen.MethodDeclaration(Constants.PollyMethodNameAsync,
                 parameters,
                 PollyGenericTypeParameters,
                 returnType,
                 Accessibility.Private,
-                //DeclarationModifiers.Async,
-                DeclarationModifiers.None,
+                includeAsyncAwait ? DeclarationModifiers.Async : DeclarationModifiers.None,
                 new[] { statement });
         }
 

@@ -8,19 +8,23 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Analyzer3</PackageId>
+    <PackageId>Pollynator</PackageId>
     <PackageVersion>1.0.0.0</PackageVersion>
-    <Authors>jmarolf</Authors>
-    <PackageLicenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</PackageLicenseUrl>
-    <PackageProjectUrl>http://PROJECT_URL_HERE_OR_DELETE_THIS_LINE</PackageProjectUrl>
-    <PackageIconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</PackageIconUrl>
-    <RepositoryUrl>http://REPOSITORY_URL_HERE_OR_DELETE_THIS_LINE</RepositoryUrl>
+    <Authors>David Paul McQuiggin</Authors>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</PackageProjectUrl>
+    <PackageIconUrl>https://avatars1.githubusercontent.com/u/16707495?v=4&amp;s=80</PackageIconUrl>
+    <RepositoryUrl>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>Analyzer3</Description>
+    <Description>A Code Fix for creating implementations of interfaces, using the Polly library for reslience (e.g. handling timeouts, retry logic, etc).</Description>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
-    <Copyright>Copyright</Copyright>
-    <PackageTags>Analyzer3, analyzers</PackageTags>
+    <Copyright>Copyright ©  2017 Pro-Coded</Copyright>
+    <PackageTags>Pollynator, Polly, Code Fix, Decorator</PackageTags>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <Company>Pro-Coded</Company>
+    <Product>Pollynator</Product>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

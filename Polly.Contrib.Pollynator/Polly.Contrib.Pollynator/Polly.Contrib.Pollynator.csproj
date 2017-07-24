@@ -16,7 +16,7 @@
     <PackageIconUrl>https://avatars1.githubusercontent.com/u/16707495?v=4&amp;s=80</PackageIconUrl>
     <RepositoryUrl>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>A Code Fix for creating implementations of interfaces, using the Polly library for resilience (e.g. handling timeouts, retry logic, etc).</Description>
+    <Description>A Code Fix for creating implementations of interfaces, using the Polly library for resilience (e.g. handling timeouts, retry logic, etc.).</Description>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
     <Copyright>Copyright ©  2017 Pro-Coded</Copyright>
     <PackageTags>Pollynator, Polly, Code Fix, Decorator</PackageTags>

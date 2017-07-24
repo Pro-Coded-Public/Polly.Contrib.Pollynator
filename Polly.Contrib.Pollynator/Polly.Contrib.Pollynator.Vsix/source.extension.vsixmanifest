@@ -3,7 +3,7 @@
   <Metadata>
     <Identity Id="Polly.Contrib.Pollynator..a4145ce4-df4f-46dc-a66c-4b98df4bb264" Version="0.1" Language="en-US" Publisher="David Paul McQuiggin"/>
     <DisplayName>Pollynator</DisplayName>
-    <Description xml:space="preserve">A Code Fix for creating implementations of interfaces, using the Polly library for resilience (e.g. handling timeouts, retry logic, etc).</Description>
+    <Description xml:space="preserve">A Code Fix for creating implementations of interfaces, using the Polly library for resilience (e.g. handling timeouts, retry logic, etc.).</Description>
     <MoreInfo>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</MoreInfo>
     <GettingStartedGuide>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</GettingStartedGuide>
     <Tags>Pollynator,. Polly, Pro-Coded</Tags>

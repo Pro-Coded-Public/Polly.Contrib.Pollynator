@@ -1,11 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="Polly.Contrib.Pollynator..a4145ce4-df4f-46dc-a66c-4b98df4bb264" Version="0.1" Language="en-US" Publisher="David Paul McQuiggin"/>
+    <Identity Id="Polly.Contrib.Pollynator..a4145ce4-df4f-46dc-a66c-4b98df4bb264" Version="0.1.1" Language="en-US" Publisher="David Paul McQuiggin"/>
     <DisplayName>Pollynator</DisplayName>
     <Description xml:space="preserve">A Code Fix for creating implementations of interfaces, using the Polly library for resilience (e.g. handling timeouts, retry logic, etc.).</Description>
     <MoreInfo>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</MoreInfo>
     <GettingStartedGuide>https://github.com/Pro-Coded/Polly.Contrib.Pollynator</GettingStartedGuide>
+    <Icon>pro.png</Icon>
     <Tags>Pollynator,. Polly, Pro-Coded</Tags>
   </Metadata>
   <Installation>

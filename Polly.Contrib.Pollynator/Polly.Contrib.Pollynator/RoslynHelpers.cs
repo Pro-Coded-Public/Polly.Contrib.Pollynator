@@ -185,7 +185,7 @@
                                                        string fieldName, List<SyntaxNode> typeArguments,
                                                        List<SyntaxNode> arguments, bool isAsync, bool includeAsyncAwait)
         {
-            var pollyMethodName = isAsync && includeAsyncAwait ? Constants.PollyMethodNameAsync : Constants.PollyMethodName;
+            var pollyMethodName = isAsync ? Constants.PollyMethodNameAsync : Constants.PollyMethodName;
 
             var invocation = gen.InvocationExpression(gen.IdentifierName(pollyMethodName),
                 gen.ValueReturningLambdaExpression(
